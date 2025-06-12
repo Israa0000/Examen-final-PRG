@@ -1,67 +1,46 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class Movement : MonoBehaviour
 {
-    public float speed = 5f;
-    public float acceleration = 10f;
-    public float friction = 5f;
-    public float rotationSpeed = 200f;
+    Rigidbody2D rb;
 
-    private Rigidbody2D rb;
-    private Vector2 velocity;
-    private bool moveForward;
-    private float rotationInput;
+    [SerializeField] float velocity;
+    [SerializeField] float speed;
+    [SerializeField] float friction;
+    [SerializeField] float maxSpeed;
 
-    public ParticleSystem thrustParticles;
 
-    void Start()
+    private void Start()
     {
-        rb = GetComponent<Rigidbody2D>();
+       rb = GetComponent<Rigidbody2D>();
     }
 
-    void Update()
+    private void Update()
     {
-        moveForward = Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow);
 
-        rotationInput = 0f;
-        if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow))
-            rotationInput = 1f;
-        else if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow))
-            rotationInput = -1f;
-
-        if (moveForward)
+        if (Input.GetKey(KeyCode.W))
         {
-            thrustParticles.Play();
+            rb.AddForce(transform.up);
         }
 
-        if (!moveForward)
+        if (Input.GetKey(KeyCode.A))
         {
-            thrustParticles.Stop();
+            rb.rotation += 1;
         }
-    }
-
-    void FixedUpdate()
-    {
-        if (rotationInput != 0f)
+        if (Input.GetKey(KeyCode.D))
         {
-            rb.MoveRotation(rb.rotation + rotationInput * rotationSpeed * Time.fixedDeltaTime);
+            rb.rotation += -1;
         }
 
-        if (moveForward)
+        if (rb.velocity.y > maxSpeed)
         {
-            Vector2 forward = transform.up;
-            velocity += forward * acceleration * Time.fixedDeltaTime;
+            speed = maxSpeed;
         }
-        else
-        {
-            //FRICCION
-            velocity = Vector2.MoveTowards(velocity, Vector2.zero, friction * Time.fixedDeltaTime);
-        }
-        //VELOCIDAD MAXIMA
-        velocity = Vector2.ClampMagnitude(velocity, speed);
 
-        rb.velocity = velocity;
+        //friccion
+        //Vector3.MoveTowards(rb.velocity, ,);
     }
 }

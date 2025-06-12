@@ -1,35 +1,25 @@
+using System.Collections;
+using System.Collections.Generic;
+using System.Net.Http.Headers;
 using UnityEngine;
 
-public class CameraController : MonoBehaviour
+public class CameraSmooth : MonoBehaviour
 {
-    public Transform player;
-    public Transform coin;
-    public float smoothTime = 0.3f;
-    public float minZoom = 5f;
-    public float maxZoom = 10f;
-    public float zoomLimiter = 5f;
+    [SerializeField] Transform player;
+    [SerializeField] Transform coin;
+    float smoothTime = 3;
+    Vector2 velocity = Vector2.zero;
+    Vector3 center;
 
-    private Vector3 velocity = Vector3.zero;
-    private Camera cam;
-
-    void Start()
+    private void Update()
     {
-        cam = GetComponent<Camera>();
-    }
+        Vector3 a = player.position + coin.position;
+        center = a / 2;
 
-    void LateUpdate()
-    {
-        if (player == null || coin == null)
-            return;
+        transform.position = center;
+        transform.position += new Vector3(0, 0, -10);
 
-        //PUNTO MEDIO ENTRE COIN Y PLAYES
-        Vector3 centerPoint = (player.position + coin.position) / 2f;
-        centerPoint.z = transform.position.z; 
-
-        transform.position = Vector3.SmoothDamp(transform.position, centerPoint, ref velocity, smoothTime);
-
-        float distance = Vector3.Distance(player.position, coin.position);
-        float targetZoom = Mathf.Lerp(minZoom, maxZoom, distance / zoomLimiter);
-        cam.orthographicSize = Mathf.Lerp(cam.orthographicSize, targetZoom, Time.deltaTime);
+        //transform.position = Vector2.SmoothDamp(center,ref velocity, smoothTime);
+        
     }
 }
